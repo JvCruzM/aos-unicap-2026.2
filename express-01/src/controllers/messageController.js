@@ -59,6 +59,37 @@ const createMessage = async (req, res) => {
   }
 };
 
+const updateMessage = async (req, res) => {
+  try {
+    if (!req.body?.text || !req.body.text.trim()) {
+      return res.status(400).send({
+        error: "O campo text é obrigatório",
+      });
+    }
+
+    const message = await messageService.updateMessage(
+      req.params.messageId,
+      {
+        text: req.body.text,
+      },
+    );
+
+    if (!message) {
+      return res.status(404).send({
+        error: "Mensagem não encontrada",
+      });
+    }
+
+    return res.status(200).send(message);
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).send({
+      error: "Erro interno do servidor",
+    });
+  }
+};
+
 const deleteMessage = async (req, res) => {
   try {
     const result = await messageService.deleteMessage(
@@ -85,5 +116,6 @@ export default {
   getMessages,
   getMessage,
   createMessage,
+  updateMessage,
   deleteMessage,
 };
