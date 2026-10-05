@@ -5,6 +5,7 @@ import {
   corsMiddleware,
   logMiddleware,
   contextMiddleware,
+  errorMiddleware,
 } from "./middlewares/index.js";
 import * as routes from "./routes/index.js";
 
@@ -23,9 +24,13 @@ app.use(contextMiddleware);
 app.get("/", (req, res) => {
   return res.send("Servidor express executando...");
 });
+
 app.use("/session", routes.session);
 app.use("/users", routes.user);
 app.use("/messages", routes.message);
+
+// middleware global de erros
+app.use(errorMiddleware);
 
 const port = process.env.PORT || 3000;
 

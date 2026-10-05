@@ -1,23 +1,16 @@
 import { userService } from "../services/index.js";
+import { AppError } from "../utils/index.js";
 
 const getSession = async (req, res) => {
-  try {
-    const user = await userService.getUserById(req.context.me.id);
+  const user = await userService.getUserById(
+    req.context.me.id,
+  );
 
-    if (!user) {
-      return res.status(404).send({
-        error: "Usuário não encontrado",
-      });
-    }
-
-    return res.status(200).send(user);
-  } catch (error) {
-    console.error(error);
-
-    return res.status(500).send({
-      error: "Erro interno do servidor",
-    });
+  if (!user) {
+    throw new AppError("Usuário não encontrado", 404);
   }
+
+  return res.status(200).send(user);
 };
 
 export default {
