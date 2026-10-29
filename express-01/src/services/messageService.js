@@ -16,21 +16,20 @@ const createMessage = async ({ text, userId }) => {
 };
 
 const updateMessage = async (id, { text }) => {
-  const message = await models.Message.findByPk(id);
-
+  const message = await getMessageById(id);
   if (!message) {
     return null;
   }
-
   return await message.update({
-    text,
+    ...(text !== undefined && { text }),
   });
 };
 
 const deleteMessage = async (id) => {
-  return await models.Message.destroy({
+  const count = await models.Message.destroy({
     where: { id },
   });
+  return count > 0;
 };
 
 export default {

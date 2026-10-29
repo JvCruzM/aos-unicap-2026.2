@@ -20,22 +20,21 @@ const createUser = async ({ username, email }) => {
 };
 
 const updateUser = async (id, { username, email }) => {
-  const user = await models.User.findByPk(id);
-
+  const user = await getUserById(id);
   if (!user) {
     return null;
   }
-
   return await user.update({
-    username,
-    email,
+    ...(username !== undefined && { username }),
+    ...(email !== undefined && { email }),
   });
 };
 
 const deleteUser = async (id) => {
-  return await models.User.destroy({
+  const count = await models.User.destroy({
     where: { id },
   });
+  return count > 0;
 };
 
 export default {
@@ -46,3 +45,4 @@ export default {
   updateUser,
   deleteUser,
 };
+

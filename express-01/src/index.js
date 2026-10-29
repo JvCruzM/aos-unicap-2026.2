@@ -1,20 +1,25 @@
 import "dotenv/config";
 import express from "express";
+import helmet from "helmet";
 import models, { sequelize } from "./models/index.js";
 import {
   corsMiddleware,
   logMiddleware,
   contextMiddleware,
+  notFoundMiddleware,
   errorMiddleware,
+  limiterMiddleware,
 } from "./middlewares/index.js";
 import * as routes from "./routes/index.js";
 
 const app = express();
 
-app.set("trust proxy", true);
+app.set("trust proxy", 1);
 
 // middlewares
+app.use(helmet());
 app.use(corsMiddleware);
+app.use(limiterMiddleware);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(logMiddleware);
@@ -24,12 +29,14 @@ app.use(contextMiddleware);
 app.get("/", (req, res) => {
   return res.send("Servidor express executando...");
 });
-
 app.use("/session", routes.session);
 app.use("/users", routes.user);
 app.use("/messages", routes.message);
 
-// middleware global de erros
+// rota não encontrada (404)
+app.use(notFoundMiddleware);
+
+// middleware global de erro
 app.use(errorMiddleware);
 
 const port = process.env.PORT || 3000;
@@ -87,3 +94,5 @@ const createUsersWithMessages = async () => {
     },
   );
 };
+
+export default app;

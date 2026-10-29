@@ -1,41 +1,55 @@
-import Sequelize from "sequelize";
 import { AppError } from "../utils/index.js";
 
 const errorMiddleware = (err, req, res, next) => {
-  let statusCode = 500;
-  let status = "error";
-  let message = "Algo deu errado no servidor";
+  const isDev = process.env.NODE_ENV !== "production";
 
-  if (err instanceof Sequelize.ValidationError) {
-    statusCode = 400;
-    status = "fail";
-
-    message = err.errors
-      .map((error) => `${error.path}: ${error.message}`)
-      .join("; ");
-  } else if (err instanceof Sequelize.UniqueConstraintError) {
-    statusCode = 409;
-    status = "fail";
-
-    message = err.errors
-      .map((error) => `${error.path}: registro duplicado`)
-      .join("; ");
-  } else if (err instanceof AppError) {
-    statusCode = err.statusCode;
-    status = err.status;
-    message = err.message;
+  if (isDev) {
+    console.error(err.stack);
+  } else {
+    console.error(`${err.name || "Error"}: ${err.message}`);
   }
 
-  const response = {
-    status,
-    message,
-  };
-
-  if (process.env.NODE_ENV === "development") {
-    response.stack = err.stack;
+  if (err instanceof AppError) {
+    return res.status(err.statusCode).send({
+      status: err.status,
+      message: err.message,
+      ...(isDev && { stack: err.stack }),
+    });
   }
 
-  return res.status(statusCode).send(response);
+  if (err.name === "SequelizeUniqueConstraintError") {
+    return res.status(409).send({
+      status: "fail",
+      message: err.errors?.length
+        ? err.errors.map((e) => e.message).join(", ")
+        : "Registro duplicado.",
+      ...(isDev && { stack: err.stack }),
+    });
+  }
+
+  if (err.name === "SequelizeValidationError") {
+    return res.status(400).send({
+      status: "fail",
+      message: err.errors?.length
+        ? err.errors.map((e) => e.message).join(", ")
+        : err.message,
+      ...(isDev && { stack: err.stack }),
+    });
+  }
+
+  if (err.name === "SequelizeDatabaseError" && err.original?.code === "22P02") {
+    return res.status(400).send({
+      status: "fail",
+      message: "Identificador (ID) fornecido possui formato inválido.",
+      ...(isDev && { stack: err.stack }),
+    });
+  }
+
+  return res.status(500).send({
+    status: "error",
+    message: isDev ? err.message : "Algo deu errado no servidor.",
+    ...(isDev && { stack: err.stack }),
+  });
 };
 
 export default errorMiddleware;
