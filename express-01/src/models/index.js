@@ -1,10 +1,11 @@
 import Sequelize from "sequelize";
 import pg from "pg";
+import { env } from "../utils/env.js";
 
 import getUserModel from "./user.js";
 import getMessageModel from "./message.js";
 
-const sequelize = new Sequelize(process.env.DATABASE_URL, {
+const sequelize = new Sequelize(env.DATABASE_URL, {
   dialect: "postgres",
   dialectModule: pg,
 });

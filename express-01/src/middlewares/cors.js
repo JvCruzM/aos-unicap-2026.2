@@ -1,9 +1,7 @@
 import cors from "cors";
-import { AppError } from "../utils/index.js";
+import { AppError, env } from "../utils/index.js";
 
-const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(",").map((o) => o.trim())
-  : ["http://localhost:3000", "http://localhost:3001"];
+const allowedOrigins = env.ALLOWED_ORIGINS.split(",").map((o) => o.trim());
 
 const corsOptionsDelegate = (req, callback) => {
   const origin = req.headers.origin;

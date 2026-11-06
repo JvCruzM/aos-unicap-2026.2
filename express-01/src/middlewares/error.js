@@ -1,7 +1,7 @@
-import { AppError } from "../utils/index.js";
+import { AppError, env } from "../utils/index.js";
 
 const errorMiddleware = (err, req, res, next) => {
-  const isDev = process.env.NODE_ENV !== "production";
+  const isDev = env.NODE_ENV !== "production";
 
   if (isDev) {
     console.error(err.stack);
