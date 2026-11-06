@@ -4,6 +4,7 @@ import { env } from "../utils/env.js";
 
 import getUserModel from "./user.js";
 import getMessageModel from "./message.js";
+import getRefreshTokenModel from "./refreshToken.js";
 
 const sequelize = new Sequelize(env.DATABASE_URL, {
   dialect: "postgres",
@@ -13,6 +14,7 @@ const sequelize = new Sequelize(env.DATABASE_URL, {
 const models = {
   User: getUserModel(sequelize, Sequelize),
   Message: getMessageModel(sequelize, Sequelize),
+  RefreshToken: getRefreshTokenModel(sequelize, Sequelize),
 };
 
 Object.keys(models).forEach((key) => {

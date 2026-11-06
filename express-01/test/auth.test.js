@@ -20,6 +20,7 @@ test("cadastro, hooks Argon2, login JWT, proteção e rate limiter", async (t) =
   // Somente a persistência é simulada; Sequelize, hooks, Argon2 e JWT são reais.
   const records = new Map();
   const queryInterface = sequelize.getQueryInterface();
+  t.mock.method(models.RefreshToken, "create", async (values) => models.RefreshToken.build(values));
   t.mock.method(queryInterface, "insert", async (instance) => {
     records.set(instance.id, instance);
     return [instance, 1];

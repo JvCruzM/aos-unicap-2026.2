@@ -63,6 +63,7 @@ const getUserModel = (sequelize, { DataTypes }) => {
 
   User.associate = (models) => {
     User.hasMany(models.Message, { foreignKey: "userId", onDelete: "CASCADE" });
+    User.hasMany(models.RefreshToken, { foreignKey: "userId", onDelete: "CASCADE" });
   };
 
   User.findByLogin = async (login) => {

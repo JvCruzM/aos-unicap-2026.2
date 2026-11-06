@@ -36,6 +36,12 @@ export const userIdParamSchema = z.object({
   params: z.object({ userId: idParam() }),
 });
 
+export const refreshTokenSchema = z.object({
+  body: z.object({
+    refreshToken: requiredString().min(1, "Campo obrigatório").max(255),
+  }),
+});
+
 export const createMessageSchema = z.object({
   body: z.object({
     text: requiredString()
