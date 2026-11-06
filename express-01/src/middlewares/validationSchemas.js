@@ -54,3 +54,26 @@ export const createMessageSchema = z.object({
 export const messageIdParamSchema = z.object({
   params: z.object({ messageId: idParam() }),
 });
+
+const descricaoTarefa = requiredString().trim().min(1, "Descrição obrigatória");
+const concluidaTarefa = z.boolean({ error: "Deve ser um booleano (true ou false)" });
+
+export const createTarefaSchema = z.object({
+  body: z.object({
+    descricao: descricaoTarefa,
+    concluida: concluidaTarefa.default(false),
+  }),
+});
+
+export const updateTarefaSchema = z.object({
+  body: z.object({
+    descricao: descricaoTarefa.optional(),
+    concluida: concluidaTarefa.optional(),
+  }).refine((data) => data.descricao !== undefined || data.concluida !== undefined, {
+    message: "Informe descricao e/ou concluida para atualizar a tarefa",
+  }),
+});
+
+export const tarefaIdParamSchema = z.object({
+  params: z.object({ objectId: idParam() }),
+});
