@@ -1,11 +1,11 @@
 import { Router } from "express";
 import { sessionController } from "../controllers/index.js";
-import { authLimiterMiddleware } from "../middlewares/index.js";
+import { authLimiterMiddleware, contextMiddleware } from "../middlewares/index.js";
 
 const router = Router();
 
 router.use(authLimiterMiddleware);
 
-router.get("/", sessionController.getSession);
+router.get("/", contextMiddleware, sessionController.getSession);
 
 export default router;

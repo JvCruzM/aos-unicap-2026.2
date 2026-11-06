@@ -6,7 +6,6 @@ import models, { sequelize } from "./models/index.js";
 import {
   corsMiddleware,
   logMiddleware,
-  contextMiddleware,
   notFoundMiddleware,
   errorMiddleware,
   limiterMiddleware,
@@ -24,7 +23,6 @@ app.use(limiterMiddleware);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(logMiddleware);
-app.use(contextMiddleware);
 
 // rotas
 app.get("/", (req, res) => {

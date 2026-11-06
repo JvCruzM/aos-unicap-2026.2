@@ -1,3 +1,4 @@
+import { ZodError } from "zod";
 import { AppError, env } from "../utils/index.js";
 
 const errorMiddleware = (err, req, res, next) => {
@@ -7,6 +8,15 @@ const errorMiddleware = (err, req, res, next) => {
     console.error(err.stack);
   } else {
     console.error(`${err.name || "Error"}: ${err.message}`);
+  }
+
+  if (err instanceof SyntaxError && err.type === "entity.parse.failed") {
+    const message = "body: JSON malformado";
+    return res.status(400).json({
+      status: "fail",
+      message,
+      errors: [message],
+    });
   }
 
   if (err instanceof AppError) {
@@ -42,6 +52,17 @@ const errorMiddleware = (err, req, res, next) => {
       status: "fail",
       message: "Identificador (ID) fornecido possui formato inválido.",
       ...(isDev && { stack: err.stack }),
+    });
+  }
+
+  if (err instanceof ZodError) {
+    const errors = err.issues.map(
+      (issue) => `${issue.path.join(".")}: ${issue.message}`,
+    );
+    return res.status(400).json({
+      status: "fail",
+      message: errors.join("; "),
+      errors,
     });
   }
 
