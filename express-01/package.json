@@ -4,6 +4,8 @@
   "description": "Projeto de exemplo para a disciplina AOS da UNICAP",
   "main": "dist/index.js",
   "scripts": {
+    "test": "node --test",
+    "db:migrate:uuid": "node scripts/migrate-uuid.js",
     "dev": "nodemon --exec babel-node src/index.js",
     "build": "babel src -d dist",
     "start": "node dist/index.js"
@@ -25,11 +27,13 @@
     "nodemon": "^3.1.14"
   },
   "dependencies": {
+    "argon2": "^0.45.2",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-rate-limit": "^8.7.1",
     "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
     "pg": "^8.23.0",
     "sequelize": "^6.37.8",
     "zod": "^4.6.7"

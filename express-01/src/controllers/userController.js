@@ -15,19 +15,24 @@ const getUser = async (req, res) => {
 };
 
 const createUser = async (req, res) => {
-  const { username, email } = req.body || {};
+  const { username, email, password } = req.body || {};
   const user = await userService.createUser({
     username,
     email,
+    password,
   });
   return res.status(201).send(user);
 };
 
 const updateUser = async (req, res) => {
-  const { username, email } = req.body || {};
+  if (req.context.me.id !== req.params.userId) {
+    throw new AppError("Você só pode alterar seu próprio usuário.", 403);
+  }
+  const { username, email, password } = req.body || {};
   const user = await userService.updateUser(req.params.userId, {
     username,
     email,
+    password,
   });
   if (!user) {
     throw new AppError("Usuário não encontrado.", 404);
@@ -36,6 +41,9 @@ const updateUser = async (req, res) => {
 };
 
 const deleteUser = async (req, res) => {
+  if (req.context.me.id !== req.params.userId) {
+    throw new AppError("Você só pode excluir seu próprio usuário.", 403);
+  }
   const isDeleted = await userService.deleteUser(req.params.userId);
   if (!isDeleted) {
     throw new AppError("Usuário não encontrado.", 404);

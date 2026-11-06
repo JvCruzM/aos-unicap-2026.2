@@ -73,7 +73,7 @@ test("POST /users exige e-mail e rejeita formato inválido", async () => {
   }
 });
 
-test("todas as rotas com ID rejeitam UUID inválido antes do controlador", async () => {
+test("todas as rotas com ID rejeitam identificador inválido antes do controlador", async () => {
   for (const resource of ["users", "messages"]) {
     for (const method of ["GET", "PUT", "DELETE"]) {
       const result = await badRequest(`/${resource}/id-invalido`, method);
@@ -90,10 +90,14 @@ test("POST /messages rejeita texto ausente, vazio, em branco ou acima do limite"
   }
 });
 
-test("schemas aceitam UUID v4 e rejeitam outra versão", async () => {
+test("schemas exigem UUID v4 e rejeitam IDs numéricos ou de outra versão", async () => {
   for (const [schema, field] of [[userIdParamSchema, "userId"], [messageIdParamSchema, "messageId"]]) {
-    await schema.parseAsync({ params: { [field]: "550e8400-e29b-41d4-a716-446655440000" } });
-    await assert.rejects(schema.parseAsync({ params: { [field]: "550e8400-e29b-11d4-a716-446655440000" } }), z.ZodError);
+    const uuid = "550e8400-e29b-41d4-a716-446655440000";
+    const data = await schema.parseAsync({ params: { [field]: uuid } });
+    assert.equal(data.params[field], uuid);
+    for (const invalid of ["1", "0", "-1", "1.5", "abc", "550e8400-e29b-11d4-a716-446655440000"]) {
+      await assert.rejects(schema.parseAsync({ params: { [field]: invalid } }), z.ZodError);
+    }
   }
   await createMessageSchema.parseAsync({ body: { text: "a".repeat(1000) } });
 });
@@ -102,10 +106,10 @@ test("dados válidos chegam sanitizados ao próximo middleware", async () => {
   const response = await fetch(`${base}/sanitized`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username: " teste ", email: " teste@example.com ", admin: true }),
+    body: JSON.stringify({ username: " teste ", email: " teste@example.com ", password: "senhaSegura123", admin: true }),
   });
   assert.equal(response.status, 200);
-  assert.deepEqual(await response.json(), { username: "teste", email: "teste@example.com" });
+  assert.deepEqual(await response.json(), { username: "teste", email: "teste@example.com", password: "senhaSegura123" });
 });
 
 test("query validada e convertida funciona no Express 5", async () => {

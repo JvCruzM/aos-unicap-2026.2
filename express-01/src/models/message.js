@@ -5,6 +5,11 @@ const getMessageModel = (sequelize, { DataTypes }) => {
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
+    legacyId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      unique: true,
+    },
     text: {
       type: DataTypes.STRING,
       allowNull: false,

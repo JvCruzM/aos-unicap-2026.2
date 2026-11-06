@@ -12,14 +12,15 @@ const getUserByLogin = async (login) => {
   return await models.User.findByLogin(login);
 };
 
-const createUser = async ({ username, email }) => {
+const createUser = async ({ username, email, password }) => {
   return await models.User.create({
     username,
     email,
+    password,
   });
 };
 
-const updateUser = async (id, { username, email }) => {
+const updateUser = async (id, { username, email, password }) => {
   const user = await getUserById(id);
   if (!user) {
     return null;
@@ -27,6 +28,7 @@ const updateUser = async (id, { username, email }) => {
   return await user.update({
     ...(username !== undefined && { username }),
     ...(email !== undefined && { email }),
+    ...(password !== undefined && { password }),
   });
 };
 
